@@ -1,4 +1,4 @@
-class_name DotCommandSanity
+class_name GSCommandSanity
 extends RefCounted
 
 ## Pure checks on what a client claims, run on the server. Each returns the detection kind it matched, or an empty string when the claim is possible. They keep no state except the command-rate window, and they trust nothing: a NaN, an infinity or a value out of range is a finding, not a crash. The kinds use the same strings as GameSpice Server Security's detectors so a score can mix both.
@@ -10,13 +10,13 @@ const RATE := "cheat.timing"
 const RANGE := "cheat.out_of_range"
 const MALFORMED := "cheat.malformed"
 
-var config: DotSuspicionConfig
+var config: GSSuspicionConfig
 
 var _stamps: Dictionary = {}   # player id -> PackedFloat64Array of recent command times
 
 
-func _init(p_config: DotSuspicionConfig = null) -> void:
-	config = p_config if p_config != null else DotSuspicionConfig.new()
+func _init(p_config: GSSuspicionConfig = null) -> void:
+	config = p_config if p_config != null else GSSuspicionConfig.new()
 
 
 ## [param from] to [param to] in [param dt] seconds. A finite step longer than the speed limit allows is SPEED; a non-finite one is MALFORMED.

@@ -1,5 +1,5 @@
-class_name DotSuspicionConfig
-extends DotConfig
+class_name GSSuspicionConfig
+extends GSConfig
 
 ## Every tunable of the suspicion score and the command sanity checks. Layers, weakest first: these defaults, `cfg/addon/dot_anticheat/*.yml`, the game's files, the operator's files, `DOT_ANTICHEAT_*` environment variables, then `--anticheat-*` flags. A limit of 0 is "unchecked" or "unlimited"; nothing here is a hidden cap.
 
@@ -50,17 +50,17 @@ func cli_prefix() -> String:
 	return "--anticheat-"
 
 
-func validate() -> DotResult:
+func validate() -> GSResult:
 	if kick_at > 0.0 and warn_at > kick_at:
-		return DotResult.fail(DotError.CODE_INVALID, "anticheat warn_at %s is above kick_at %s" % [warn_at, kick_at])
+		return GSResult.fail(GSError.CODE_INVALID, "anticheat warn_at %s is above kick_at %s" % [warn_at, kick_at])
 	if ban_at > 0.0 and kick_at > ban_at:
-		return DotResult.fail(DotError.CODE_INVALID, "anticheat kick_at %s is above ban_at %s" % [kick_at, ban_at])
+		return GSResult.fail(GSError.CODE_INVALID, "anticheat kick_at %s is above ban_at %s" % [kick_at, ban_at])
 	if history_per_player < 0 or max_players < 0:
-		return DotResult.fail(DotError.CODE_INVALID, "anticheat limits cannot be negative (0 is unlimited)")
+		return GSResult.fail(GSError.CODE_INVALID, "anticheat limits cannot be negative (0 is unlimited)")
 	for entry in weights:
 		if not "=" in entry or not str(entry.get_slice("=", 1)).is_valid_float():
-			return DotResult.fail(DotError.CODE_INVALID, "anticheat weight '%s' is not kind=number" % entry)
-	return DotResult.success(self)
+			return GSResult.fail(GSError.CODE_INVALID, "anticheat weight '%s' is not kind=number" % entry)
+	return GSResult.success(self)
 
 
 ## The weights table as a dictionary of kind to points.
@@ -73,9 +73,9 @@ func weight_table() -> Dictionary:
 
 
 ## Defaults, then `cfg/addon/dot_anticheat/*.yml` and the game tier, then environment and command line.
-static func from_files() -> DotResult:
-	var cfg := DotSuspicionConfig.new()
-	var files := DotAddonConfig.load_dir(ADDON)
+static func from_files() -> GSResult:
+	var cfg := GSSuspicionConfig.new()
+	var files := GSAddonConfig.load_dir(ADDON)
 	if not files.ok:
 		return files
 	cfg.apply_dictionary(files.value as Dictionary, "yml")

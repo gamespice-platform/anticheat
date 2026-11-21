@@ -1,36 +1,36 @@
-class_name DotSuspicionWatch
+class_name GSSuspicionWatch
 extends Node
 
-## Listens to a detector's `detected(session, kind, impossible, detail)` signal (GameSpice Server Security's DotAntiCheat has exactly that), feeds a [DotSuspicion], and emits [signal escalated] when a player reaches a higher level. It does not kick or ban: connect [signal escalated] to whatever does, for example a DotSecurityManager report.
+## Listens to a detector's `detected(session, kind, impossible, detail)` signal (GameSpice Server Security's GSAntiCheat has exactly that), feeds a [GSSuspicion], and emits [signal escalated] when a player reaches a higher level. It does not kick or ban: connect [signal escalated] to whatever does, for example a GSSecurityManager report.
 
 ## A player reached a higher level than before.
 signal escalated(player_id: String, level: int, score: float)
 
-@export var config: DotSuspicionConfig = null
+@export var config: GSSuspicionConfig = null
 
-var suspicion: DotSuspicion
-var sanity: DotCommandSanity
+var suspicion: GSSuspicion
+var sanity: GSCommandSanity
 
 
 func _ready() -> void:
 	if config == null:
-		config = DotSuspicionConfig.new()
-	suspicion = DotSuspicion.new(config)
-	sanity = DotCommandSanity.new(config)
+		config = GSSuspicionConfig.new()
+	suspicion = GSSuspicion.new(config)
+	sanity = GSCommandSanity.new(config)
 
 
 ## Connects to [param source]'s `detected` signal. Fails loudly when it has none.
-func attach(source: Object) -> DotResult:
+func attach(source: Object) -> GSResult:
 	if source == null or not source.has_signal("detected"):
-		return DotResult.fail(DotError.CODE_INVALID, "suspicion watch needs a source with a detected signal")
+		return GSResult.fail(GSError.CODE_INVALID, "suspicion watch needs a source with a detected signal")
 	if suspicion == null:
 		_ready()
 	source.connect("detected", _on_detected)
-	return DotResult.success(true)
+	return GSResult.success(true)
 
 
 ## Scores one finding directly, for a check run in game code.
-func report(player_id: Variant, kind: StringName, impossible: bool = false) -> DotResult:
+func report(player_id: Variant, kind: StringName, impossible: bool = false) -> GSResult:
 	var before := suspicion.level(player_id)
 	var r := suspicion.observe(player_id, kind, impossible)
 	if r.ok and int((r.value as Dictionary)["level"]) > before:

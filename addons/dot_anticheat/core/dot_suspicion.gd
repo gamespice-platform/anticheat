@@ -1,11 +1,11 @@
-class_name DotSuspicion
+class_name GSSuspicion
 extends RefCounted
 
 ## A decaying suspicion score per player. Detectors (GameSpice Server Security ships speed, teleport and aim-snap ones) report what they saw; this adds it up, forgives it over time, and says which level the player has reached. It never acts: the game kicks or bans, so a wrong score costs a log line, not a good player's account.
 
 enum Level { NONE, WARN, KICK, BAN }
 
-var config: DotSuspicionConfig
+var config: GSSuspicionConfig
 ## Players forgotten to stay inside `max_players`.
 var evicted: int = 0
 
@@ -13,8 +13,8 @@ var _players: Dictionary = {}   # id -> {"score": float, "at": float, "level": i
 var _weights: Dictionary = {}
 
 
-func _init(p_config: DotSuspicionConfig = null) -> void:
-	config = p_config if p_config != null else DotSuspicionConfig.new()
+func _init(p_config: GSSuspicionConfig = null) -> void:
+	config = p_config if p_config != null else GSSuspicionConfig.new()
 	_weights = config.weight_table()
 
 
@@ -22,13 +22,13 @@ static func level_name(level: int) -> String:
 	return String(Level.keys()[level]).to_lower()
 
 
-## Adds one detection for [param player_id] at [param now] (seconds). The argument order matches the detected signal of GameSpice Server Security, so it can be connected straight to a handler. Returns a DotResult whose value is {score, level, changed}.
-func observe(player_id: Variant, kind: StringName, impossible: bool = false, now: float = -1.0) -> DotResult:
+## Adds one detection for [param player_id] at [param now] (seconds). The argument order matches the detected signal of GameSpice Server Security, so it can be connected straight to a handler. Returns a GSResult whose value is {score, level, changed}.
+func observe(player_id: Variant, kind: StringName, impossible: bool = false, now: float = -1.0) -> GSResult:
 	if not config.enabled:
-		return DotResult.success({"score": 0.0, "level": Level.NONE, "changed": false})
+		return GSResult.success({"score": 0.0, "level": Level.NONE, "changed": false})
 	var id := str(player_id)
 	if id == "":
-		return DotResult.fail(DotError.CODE_INVALID, "suspicion needs a player id")
+		return GSResult.fail(GSError.CODE_INVALID, "suspicion needs a player id")
 	var t := _now(now)
 	var p := _entry(id, t)
 	_decay(p, t)
@@ -38,7 +38,7 @@ func observe(player_id: Variant, kind: StringName, impossible: bool = false, now
 	var before := int(p["level"])
 	var after := _level_for(float(p["score"]))
 	p["level"] = after
-	return DotResult.success({"score": p["score"], "level": after, "changed": after != before})
+	return GSResult.success({"score": p["score"], "level": after, "changed": after != before})
 
 
 ## The score after decay; 0 for a player never seen.
@@ -84,7 +84,7 @@ func to_dict() -> Dictionary:
 
 
 ## Replaces what is tracked with [param data] from [method to_dict]. Entries with the wrong shape are skipped; the value is how many.
-func load_dict(data: Dictionary) -> DotResult:
+func load_dict(data: Dictionary) -> GSResult:
 	_players.clear()
 	var skipped := 0
 	for id in data:
@@ -93,7 +93,7 @@ func load_dict(data: Dictionary) -> DotResult:
 			_players[str(id)] = (e as Dictionary).duplicate(true)
 		else:
 			skipped += 1
-	return DotResult.success(skipped)
+	return GSResult.success(skipped)
 
 
 func forget(player_id: Variant) -> void:

@@ -5,8 +5,8 @@ extends EditorPlugin
 
 
 func _enter_tree() -> void:
-	add_custom_type("DotSuspicionWatch", "Node", load("res://addons/dot_anticheat/runtime/dot_suspicion_watch.gd"), null)
+	add_custom_type("GSSuspicionWatch", "Node", load("res://addons/dot_anticheat/runtime/dot_suspicion_watch.gd"), null)
 
 
 func _exit_tree() -> void:
-	remove_custom_type("DotSuspicionWatch")
+	remove_custom_type("GSSuspicionWatch")

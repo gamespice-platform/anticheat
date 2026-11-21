@@ -14,8 +14,8 @@ For review, `history(id)` returns a player's newest detections (kind, proof or s
 ## Quick start
 
 ```gdscript
-var watch := DotSuspicionWatch.new()
-watch.config = DotSuspicionConfig.from_files().value   # layered cfg, env and flags
+var watch := GSSuspicionWatch.new()
+watch.config = GSSuspicionConfig.from_files().value   # layered cfg, env and flags
 add_child(watch)
 
 # 1. Feed it from the Server Security detector (any node with a detected signal works).
@@ -28,15 +28,15 @@ if bad != "":
 
 # 3. Decide what a level means.
 watch.escalated.connect(func(id, level, score):
-    if level == DotSuspicion.Level.KICK:
+    if level == GSSuspicion.Level.KICK:
         kick(id))
 ```
 
-`DotSuspicion` and `DotCommandSanity` are plain objects too, so a headless server can use them without the node. Pass the time in seconds to `observe` and `score` to make a run repeatable.
+`GSSuspicion` and `GSCommandSanity` are plain objects too, so a headless server can use them without the node. Pass the time in seconds to `observe` and `score` to make a run repeatable.
 
 ## Settings
 
-Every number is a field on `DotSuspicionConfig`. A value of 0 means unchecked or unlimited; the inspector ranges are slider limits, not enforced caps.
+Every number is a field on `GSSuspicionConfig`. A value of 0 means unchecked or unlimited; the inspector ranges are slider limits, not enforced caps.
 
 | Setting | Default | What it does |
 | --- | --- | --- |
@@ -58,7 +58,7 @@ Layers, weakest first: the defaults, `cfg/addon/dot_anticheat/*.yml`, the game's
 
 ## What it is not
 
-- Not the detectors: re-simulating movement and spotting speed, teleport and aim-snap is GameSpice Server Security's DotAntiCheat. Use it as the source and let this addon score what it reports. The configuration class here is called `DotSuspicionConfig` so it never clashes with Server Security's.
+- Not the detectors: re-simulating movement and spotting speed, teleport and aim-snap is GameSpice Server Security's GSAntiCheat. Use it as the source and let this addon score what it reports. The configuration class here is called `GSSuspicionConfig` so it never clashes with Server Security's.
 - Not a punishment system: bans, mutes and appeals are GameSpice Moderation. A level here is a signal for it, not a verdict.
 - Not a client-side tool: there is no driver, no scanner and no kernel hook. Nothing the client says is trusted, and nothing runs on the player's machine.
 - Not proof of cheating on its own: a high score is a reason for a human to look. The ban level is off by default for that reason.
