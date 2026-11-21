@@ -1,0 +1,4 @@
+# Shipped defaults are in DotSuspicionConfig; a key here overrides one.
+# warn_at: 20
+# kick_at: 60
+# ban_at: 0
