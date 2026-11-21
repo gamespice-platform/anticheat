@@ -1,9 +1,9 @@
 class_name GSSuspicionConfig
 extends GSConfig
 
-## Every tunable of the suspicion score and the command sanity checks. Layers, weakest first: these defaults, `cfg/addon/dot_anticheat/*.yml`, the game's files, the operator's files, `DOT_ANTICHEAT_*` environment variables, then `--anticheat-*` flags. A limit of 0 is "unchecked" or "unlimited"; nothing here is a hidden cap.
+## Every tunable of the suspicion score and the command sanity checks. Layers, weakest first: these defaults, `cfg/addon/gs_anticheat/*.yml`, the game's files, the operator's files, `GS_ANTICHEAT_*` environment variables, then `--anticheat-*` flags. A limit of 0 is "unchecked" or "unlimited"; nothing here is a hidden cap.
 
-const ADDON := "dot-anticheat"
+const ADDON := "gs-anticheat"
 
 ## Master switch. Off, nothing is scored and every sanity check passes.
 @export var enabled: bool = true
@@ -43,7 +43,7 @@ const ADDON := "dot-anticheat"
 
 
 func env_prefix() -> String:
-	return "DOT_ANTICHEAT_"
+	return "GS_ANTICHEAT_"
 
 
 func cli_prefix() -> String:
@@ -72,7 +72,7 @@ func weight_table() -> Dictionary:
 	return out
 
 
-## Defaults, then `cfg/addon/dot_anticheat/*.yml` and the game tier, then environment and command line.
+## Defaults, then `cfg/addon/gs_anticheat/*.yml` and the game tier, then environment and command line.
 static func from_files() -> GSResult:
 	var cfg := GSSuspicionConfig.new()
 	var files := GSAddonConfig.load_dir(ADDON)

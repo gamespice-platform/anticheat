@@ -1,21 +1,21 @@
 # GameSpice Anticheat
 
-Per-player suspicion scoring and command sanity checks for dedicated servers. Read the family [CLAUDE.md](../../CLAUDE.md) first. **The distributable is `addons/dot_anticheat/`**; it requires [GameSpice Core](../dot-core) only (`ln -s ../../dot-core/addons/dot_core addons/dot_core`, gitignored).
+Per-player suspicion scoring and command sanity checks for dedicated servers. Read the family [CLAUDE.md](../../CLAUDE.md) first. **The distributable is `addons/gs_anticheat/`**; it requires [GameSpice Core](../gs-core) only (`ln -s ../../gs-core/addons/gs_core addons/gs_core`, gitignored).
 
 | Path | What |
 | --- | --- |
-| `core/dot_suspicion_config.gd` | `GSSuspicionConfig`: every tunable, `from_files()`, `validate()` |
-| `core/dot_suspicion.gd` | `GSSuspicion`: decaying score per player, levels none/warn/kick/ban |
-| `core/dot_command_sanity.gd` | `GSCommandSanity`: pure move, look, range and command-rate checks |
-| `runtime/dot_suspicion_watch.gd` | `GSSuspicionWatch`: node that listens to a `detected` signal and emits `escalated` |
+| `core/gs_suspicion_config.gd` | `GSSuspicionConfig`: every tunable, `from_files()`, `validate()` |
+| `core/gs_suspicion.gd` | `GSSuspicion`: decaying score per player, levels none/warn/kick/ban |
+| `core/gs_command_sanity.gd` | `GSCommandSanity`: pure move, look, range and command-rate checks |
+| `runtime/gs_suspicion_watch.gd` | `GSSuspicionWatch`: node that listens to a `detected` signal and emits `escalated` |
 | `examples/anticheat_selftest.tscn` | the suite |
 
 ## Boundary (what it is not)
 
-- **dot-server-security already ships `GSAntiCheat`, `GSAntiCheatConfig`, `GSAntiCheatEvent`** (speed, teleport, aim-snap and more detectors, `detected` signal, escalation through `GSSecurityManager`). Do **not** re-implement detectors here. This addon consumes their detections duck-typed (`kind`, `impossible`) and scores them.
+- **gs-server-security already ships `GSAntiCheat`, `GSAntiCheatConfig`, `GSAntiCheatEvent`** (speed, teleport, aim-snap and more detectors, `detected` signal, escalation through `GSSecurityManager`). Do **not** re-implement detectors here. This addon consumes their detections duck-typed (`kind`, `impossible`) and scores them.
 - Our classes are `GSSuspicion*` and `GSCommandSanity` on purpose: `GSAnticheatConfig` would collide with `GSAntiCheatConfig` case-insensitively. Do not rename them to match the addon.
-- **dot-moderation** owns punishments, bans and appeals. This addon only reports a level; it never kicks or bans.
-- **dot-log** and **dot-telemetry** own logging and analytics; scores may be logged by the game, not here.
+- **gs-moderation** owns punishments, bans and appeals. This addon only reports a level; it never kicks or bans.
+- **gs-log** and **gs-telemetry** own logging and analytics; scores may be logged by the game, not here.
 - Nothing client-side: no driver, no scanner, nothing is trusted from the client.
 
 ## Rules

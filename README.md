@@ -8,7 +8,7 @@ For review, `history(id)` returns a player's newest detections (kind, proof or s
 
 ## Install
 
-1. Copy `addons/dot_anticheat/` and `addons/dot_core/` into your project.
+1. Copy `addons/gs_anticheat/` and `addons/gs_core/` into your project.
 2. Enable GameSpice Anticheat in *Project > Project Settings > Plugins*.
 
 ## Quick start
@@ -54,7 +54,7 @@ Every number is a field on `GSSuspicionConfig`. A value of 0 means unchecked or 
 | `max_command_rate` | 0 | Commands per second per player; 0 leaves it unchecked. |
 | `world_extent` | 0 | Largest legal coordinate on any axis; 0 leaves it unchecked. |
 
-Layers, weakest first: the defaults, `cfg/addon/dot_anticheat/*.yml`, the game's files, the operator's files, `DOT_ANTICHEAT_*` environment variables, then `--anticheat-*` flags. A value that makes no sense, such as a warning level above the kick level, fails `validate()` with a reason.
+Layers, weakest first: the defaults, `cfg/addon/gs_anticheat/*.yml`, the game's files, the operator's files, `GS_ANTICHEAT_*` environment variables, then `--anticheat-*` flags. A value that makes no sense, such as a warning level above the kick level, fails `validate()` with a reason.
 
 ## What it is not
 

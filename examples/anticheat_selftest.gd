@@ -1,6 +1,6 @@
 extends Node
 
-## dot-anticheat's headless suite (res://examples/anticheat_selftest.tscn).
+## gs-anticheat's headless suite (res://examples/anticheat_selftest.tscn).
 ## Counts sections run to their last line as well as checks, because a script error
 ## aborts a section and not the run.
 
@@ -24,7 +24,7 @@ class FakeSession:
 
 
 func _ready() -> void:
-	print("dot-anticheat")
+	print("gs-anticheat")
 	_config()
 	_score()
 	_levels()
