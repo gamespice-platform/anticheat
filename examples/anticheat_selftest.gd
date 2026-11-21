@@ -4,8 +4,8 @@ extends Node
 ## Counts sections run to their last line as well as checks, because a script error
 ## aborts a section and not the run.
 
-const EXPECTED_SECTIONS := 6
-const EXPECTED_CHECKS := 52
+const EXPECTED_SECTIONS := 7
+const EXPECTED_CHECKS := 60
 
 var _passed := 0
 var _failed := 0
@@ -31,6 +31,7 @@ func _ready() -> void:
 	_sanity()
 	_watch()
 	_layers()
+	_review()
 	print("")
 	_check(_sections == EXPECTED_SECTIONS, "every section ran to its last line (%d of %d)" % [_sections, EXPECTED_SECTIONS])
 	_check(_passed + _failed == EXPECTED_CHECKS, "and the suite ran all %d of its checks (%d)" % [EXPECTED_CHECKS, _passed + _failed])
@@ -179,6 +180,34 @@ func _layers() -> void:
 	var r := DotSuspicionConfig.from_files()
 	_check(r.ok and (r.value as DotSuspicionConfig).validate().ok, "the layered config loads and validates", str(r.code()))
 	_check(DotSuspicionConfig.new().describe().contains("warn"), "describe names the levels")
+	_sections += 1
+
+
+func _review() -> void:
+	var c := DotSuspicionConfig.new()
+	c.history_per_player = 2
+	c.decay_per_second = 0.0
+	var s := DotSuspicion.new(c)
+	s.observe("p1", &"cheat.speed", false, 1.0)
+	s.observe("p1", &"cheat.aim", true, 2.0)
+	s.observe("p1", &"cheat.speed", false, 3.0)
+	var h := s.history("p1")
+	_check(h.size() == 2 and h[0]["kind"] == "cheat.aim" and h[0]["impossible"] and h[1]["at"] == 3.0, "history keeps the newest detections, oldest first")
+	_check(s.history("nobody").is_empty(), "no history for an unknown player")
+	var snap := s.to_dict()
+	var s2 := DotSuspicion.new(c)
+	_check(s2.load_dict(snap).value == 0 and is_equal_approx(s2.score("p1", 3.0), s.score("p1", 3.0)), "to_dict and load_dict round-trip")
+	_check(s2.load_dict({"x": 5, "p2": {"score": 1.0, "at": 0.0, "level": 0, "events": 1, "recent": []}}).value == 1 and s2.size() == 1, "load_dict skips bad entries and counts them")
+	snap["p1"]["events"] = 99
+	_check(s.events("p1") == 3, "to_dict is a copy")
+	s.reset("p1")
+	_check(s.score("p1", 3.0) == 0.0 and s.level("p1", 3.0) == DotSuspicion.Level.NONE and s.history("p1").is_empty() and s.events("p1") == 3, "reset clears score and history, keeps the count")
+	c.history_per_player = 0
+	for i in 100:
+		s.observe("p3", &"k", false, float(i))
+	_check(s.history("p3").size() == 100, "history 0 is unlimited")
+	c.history_per_player = -1
+	_check(not c.validate().ok, "a negative limit is refused")
 	_sections += 1
 
 

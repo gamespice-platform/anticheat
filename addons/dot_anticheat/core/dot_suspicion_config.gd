@@ -20,6 +20,9 @@ const ADDON := "dot-anticheat"
 ## Players tracked at once; 0 is unlimited. At the limit the lowest score is forgotten first and counted.
 @export_range(0, 1000000, 1) var max_players: int = 0
 
+## Recent detections kept per player for a person to read; 0 is unlimited.
+@export_range(0, 100000, 1) var history_per_player: int = 20
+
 @export_group("Escalation")
 ## Score at which a player is flagged for a human to look at; 0 turns the level off.
 @export_range(0.0, 100000.0, 1.0) var warn_at: float = 20.0
@@ -52,6 +55,8 @@ func validate() -> DotResult:
 		return DotResult.fail(DotError.CODE_INVALID, "anticheat warn_at %s is above kick_at %s" % [warn_at, kick_at])
 	if ban_at > 0.0 and kick_at > ban_at:
 		return DotResult.fail(DotError.CODE_INVALID, "anticheat kick_at %s is above ban_at %s" % [kick_at, ban_at])
+	if history_per_player < 0 or max_players < 0:
+		return DotResult.fail(DotError.CODE_INVALID, "anticheat limits cannot be negative (0 is unlimited)")
 	for entry in weights:
 		if not "=" in entry or not str(entry.get_slice("=", 1)).is_valid_float():
 			return DotResult.fail(DotError.CODE_INVALID, "anticheat weight '%s' is not kind=number" % entry)

@@ -4,6 +4,8 @@ Godot 4.7+ addon for server-side anti-cheat: speed, teleport and aim-snap detect
 
 The detectors that re-simulate movement and aim live in GameSpice Server Security. This addon is the layer on top: it adds up what they report into a score that decays, says when a player reaches a warning, kick or ban level, and offers pure sanity checks for the commands a client sends. It never acts by itself. Your game, or a Server Security rule, decides what a level means.
 
+For review, `history(id)` returns a player's newest detections (kind, proof or suspicion, time; bounded by `history_per_player`, 0 is unlimited), `reset(id)` clears score and history after a person looked, and `to_dict()` / `load_dict()` let GameSpice Save keep the table. The addon still never acts: it says which level a player reached.
+
 ## Install
 
 1. Copy `addons/dot_anticheat/` and `addons/dot_core/` into your project.

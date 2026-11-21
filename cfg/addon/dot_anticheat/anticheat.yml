@@ -2,3 +2,4 @@
 # warn_at: 20
 # kick_at: 60
 # ban_at: 0
+# history_per_player: 20   # recent detections kept per player; 0 is unlimited

@@ -34,6 +34,7 @@ func observe(player_id: Variant, kind: StringName, impossible: bool = false, now
 	_decay(p, t)
 	p["score"] = float(p["score"]) + _points(kind, impossible)
 	p["events"] = int(p["events"]) + 1
+	_remember(p, kind, impossible, t)
 	var before := int(p["level"])
 	var after := _level_for(float(p["score"]))
 	p["level"] = after
@@ -62,6 +63,39 @@ func events(player_id: Variant) -> int:
 	return 0 if p == null else int(p["events"])
 
 
+## The newest detections of a player, oldest first, as [{kind, impossible, at}]: what a person reads before acting on a score. Bounded by `history_per_player`.
+func history(player_id: Variant) -> Array:
+	var p: Variant = _players.get(str(player_id))
+	return [] if p == null else (p["recent"] as Array).duplicate(true)
+
+
+## Clears a player's score and history after a person reviewed them (the detection count is kept).
+func reset(player_id: Variant) -> void:
+	var p: Variant = _players.get(str(player_id))
+	if p != null:
+		p["score"] = 0.0
+		p["level"] = Level.NONE
+		(p["recent"] as Array).clear()
+
+
+## Everything tracked, as plain data a game can store: {id: {score, at, level, events, recent}}. Times are the clock's own, so only reload it where the same clock runs.
+func to_dict() -> Dictionary:
+	return _players.duplicate(true)
+
+
+## Replaces what is tracked with [param data] from [method to_dict]. Entries with the wrong shape are skipped; the value is how many.
+func load_dict(data: Dictionary) -> DotResult:
+	_players.clear()
+	var skipped := 0
+	for id in data:
+		var e: Variant = data[id]
+		if e is Dictionary and e.has("score") and e.has("at") and e.has("level") and e.has("events") and e.get("recent") is Array:
+			_players[str(id)] = (e as Dictionary).duplicate(true)
+		else:
+			skipped += 1
+	return DotResult.success(skipped)
+
+
 func forget(player_id: Variant) -> void:
 	_players.erase(str(player_id))
 
@@ -80,6 +114,13 @@ func top(n: int = 10, now: float = -1.0) -> Array:
 	if n > 0 and rows.size() > n:
 		rows.resize(n)
 	return rows
+
+
+func _remember(p: Dictionary, kind: StringName, impossible: bool, t: float) -> void:
+	var recent: Array = p["recent"]
+	recent.append({"kind": String(kind), "impossible": impossible, "at": t})
+	if config.history_per_player > 0 and recent.size() > config.history_per_player:
+		recent.pop_front()
 
 
 func _points(kind: StringName, impossible: bool) -> float:
@@ -110,7 +151,7 @@ func _entry(id: String, t: float) -> Dictionary:
 		return _players[id]
 	if config.max_players > 0 and _players.size() >= config.max_players:
 		_evict_lowest(t)
-	var p := {"score": 0.0, "at": t, "level": Level.NONE, "events": 0}
+	var p := {"score": 0.0, "at": t, "level": Level.NONE, "events": 0, "recent": []}
 	_players[id] = p
 	return p
 
