@@ -2,6 +2,8 @@
 
 Godot 4.7+ addon for server-side anti-cheat: speed, teleport and aim-snap detectors, command and state sanity checks, a suspicion score per player, and escalation through GameSpice Server Security. Nothing is trusted from the client and no driver is installed. Part of the GameSpice addon family.
 
+This is a GameSpice addon (MIT, built with Claude Code) with an offline headless test, `res://examples/anticheat_selftest.tscn`. The games in [Zee's Games](https://zeesgames.com) run on live servers and are built on the GameSpice addons, so the platform it belongs to runs in real play.
+
 The detectors that re-simulate movement and aim live in GameSpice Server Security. This addon is the layer on top: it adds up what they report into a score that decays, says when a player reaches a warning, kick or ban level, and offers pure sanity checks for the commands a client sends. It never acts by itself. Your game, or a Server Security rule, decides what a level means.
 
 For review, `history(id)` returns a player's newest detections (kind, proof or suspicion, time; bounded by `history_per_player`, 0 is unlimited), `reset(id)` clears score and history after a person looked, and `to_dict()` / `load_dict()` let GameSpice Save keep the table. The addon still never acts: it says which level a player reached.
@@ -72,9 +74,9 @@ godot --headless --path . res://examples/anticheat_selftest.tscn
 
 The self-test is offline and exits non-zero on any failure.
 
-## Status
+## Used by
 
-Built and maintained with Claude Code. The test suites pass, but little of this has been in front of real players yet. Please report rough edges by opening an issue.
+No shipped game vendors it yet. The example scene shows how it is wired. The whole collection is at [zeesgames.com](https://zeesgames.com).
 
 ## Licence
 
